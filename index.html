@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Delivery App</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f8f8;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #ff4d4d;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+    }
+    .container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+        color: #ff4d4d;
+    }
+    button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        margin: 0.5rem 0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #e60000;
+    }
+    .order {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 5px;
+    }
+    .delivery-fee {
+        font-weight: bold;
+        color: #333;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Food Delivery App</h1>
+</header>
+
+<div class="container">
+    <h2>Restaurants</h2>
+    <div class="order">
+        <p><strong>Restaurant:</strong> Pizza Place</p>
+        <p><strong>Order:</strong> Margherita Pizza</p>
+        <button onclick="placeOrder('Pizza Place', 'Margherita Pizza')">Place Order</button>
+        <button onclick="cancelOrder('Pizza Place', 'Margherita Pizza')">Cancel Order</button>
+    </div>
+    <div class="order">
+        <p><strong>Restaurant:</strong> Sushi Corner</p>
+        <p><strong>Order:</strong> California Roll</p>
+        <button onclick="placeOrder('Sushi Corner', 'California Roll')">Place Order</button>
+        <button onclick="cancelOrder('Sushi Corner', 'California Roll')">Cancel Order</button>
+    </div>
+
+    <h2>Delivery Fee Strategy</h2>
+    <button onclick="setDeliveryStrategy('standard')">Standard Delivery</button>
+    <button onclick="setDeliveryStrategy('express')">Express Delivery</button>
+    <button onclick="setDeliveryStrategy('free')">Free Delivery Coupon</button>
+    <p class="delivery-fee">Delivery Fee: $<span id="deliveryFee">0</span></p>
+
+    <h2>Order Tracking</h2>
+    <button onclick="trackOrder()">Track Order</button>
+    <p id="trackingStatus">No order placed yet.</p>
+</div>
+
+<script>
+    // Observer Pattern: Notify delivery agents
+    const deliveryAgents = [];
+    function addDeliveryAgent(agent) { deliveryAgents.push(agent); }
+    function notifyDeliveryAgents(order) {
+        deliveryAgents.forEach(agent => agent.update(order));
+    }
+
+    // Sample delivery agent
+    const agent1 = {
+        update: (order) => console.log("Agent1 notified for order:", order)
+    };
+    addDeliveryAgent(agent1);
+
+    // Strategy Pattern: Delivery fee
+    let deliveryStrategy = 'standard';
+    function setDeliveryStrategy(strategy) {
+        deliveryStrategy = strategy;
+        updateDeliveryFee();
+    }
+    function updateDeliveryFee() {
+        let fee = 0;
+        if (deliveryStrategy === 'standard') fee = 5;
+        else if (deliveryStrategy === 'express') fee = 10;
+        else if (deliveryStrategy === 'free') fee = 0;
+        document.getElementById('deliveryFee').textContent = fee;
+    }
+
+    // Command Pattern: Place, cancel, track order
+    const commands = {
+        place: (restaurant, item) => {
+            notifyDeliveryAgents({restaurant, item});
+            document.getElementById('trackingStatus').textContent = `Order placed: ${item} from ${restaurant}`;
+        },
+        cancel: (restaurant, item) => {
+            document.getElementById('trackingStatus').textContent = `Order canceled: ${item} from ${restaurant}`;
+        },
+        track: () => {
+            alert(document.getElementById('trackingStatus').textContent);
+        }
+    };
+
+    function placeOrder(restaurant, item) { commands.place(restaurant, item); }
+    function cancelOrder(restaurant, item) { commands.cancel(restaurant, item); }
+    function trackOrder() { commands.track(); }
+</script>
+
+</body>
+</html>
