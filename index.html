@@ -7,7 +7,7 @@
 <style>
     body {
         font-family: Arial, sans-serif;
-        background-color: #f8f8f8;
+        background-color: #f4f4f4;
         margin: 0;
         padding: 0;
     }
@@ -15,90 +15,133 @@
         background-color: #ff4d4d;
         color: white;
         text-align: center;
-        padding: 1rem;
+        padding: 1.5rem 0;
+        font-size: 1.8rem;
     }
     .container {
-        max-width: 800px;
+        max-width: 900px;
         margin: 2rem auto;
-        padding: 1rem;
+        padding: 1.5rem;
         background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     h2 {
         color: #ff4d4d;
+        margin-bottom: 1rem;
+    }
+    .restaurant, .strategy, .tracking {
+        margin-bottom: 2rem;
+    }
+    .order-card {
+        border: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #fff8f8;
     }
     button {
         background-color: #ff4d4d;
         color: white;
         border: none;
         padding: 0.5rem 1rem;
-        margin: 0.5rem 0;
-        border-radius: 4px;
+        margin-left: 0.5rem;
+        border-radius: 5px;
         cursor: pointer;
     }
     button:hover {
         background-color: #e60000;
     }
-    .order {
-        border: 1px solid #ddd;
-        padding: 1rem;
-        margin: 1rem 0;
+    select {
+        padding: 0.4rem;
+        font-size: 1rem;
         border-radius: 5px;
+        border: 1px solid #ccc;
     }
     .delivery-fee {
         font-weight: bold;
-        color: #333;
+        margin-top: 0.5rem;
+    }
+    .notification {
+        background-color: #ffefc6;
+        border: 1px solid #ffd700;
+        padding: 0.8rem;
+        margin-top: 1rem;
+        border-radius: 5px;
+        display: none;
     }
 </style>
 </head>
 <body>
 
-<header>
-    <h1>Food Delivery App</h1>
-</header>
+<header>Food Delivery App</header>
 
 <div class="container">
-    <h2>Restaurants</h2>
-    <div class="order">
-        <p><strong>Restaurant:</strong> Pizza Place</p>
-        <p><strong>Order:</strong> Margherita Pizza</p>
-        <button onclick="placeOrder('Pizza Place', 'Margherita Pizza')">Place Order</button>
-        <button onclick="cancelOrder('Pizza Place', 'Margherita Pizza')">Cancel Order</button>
-    </div>
-    <div class="order">
-        <p><strong>Restaurant:</strong> Sushi Corner</p>
-        <p><strong>Order:</strong> California Roll</p>
-        <button onclick="placeOrder('Sushi Corner', 'California Roll')">Place Order</button>
-        <button onclick="cancelOrder('Sushi Corner', 'California Roll')">Cancel Order</button>
+
+    <!-- Restaurants Section -->
+    <div class="restaurant">
+        <h2>Restaurants</h2>
+        <div class="order-card">
+            <div>
+                <strong>Pizza Place</strong> - Margherita Pizza
+            </div>
+            <div>
+                <button onclick="placeOrder('Pizza Place', 'Margherita Pizza')">Place Order</button>
+                <button onclick="cancelOrder('Pizza Place', 'Margherita Pizza')">Cancel Order</button>
+            </div>
+        </div>
+        <div class="order-card">
+            <div>
+                <strong>Sushi Corner</strong> - California Roll
+            </div>
+            <div>
+                <button onclick="placeOrder('Sushi Corner', 'California Roll')">Place Order</button>
+                <button onclick="cancelOrder('Sushi Corner', 'California Roll')">Cancel Order</button>
+            </div>
+        </div>
+        <div id="notification" class="notification"></div>
     </div>
 
-    <h2>Delivery Fee Strategy</h2>
-    <button onclick="setDeliveryStrategy('standard')">Standard Delivery</button>
-    <button onclick="setDeliveryStrategy('express')">Express Delivery</button>
-    <button onclick="setDeliveryStrategy('free')">Free Delivery Coupon</button>
-    <p class="delivery-fee">Delivery Fee: $<span id="deliveryFee">0</span></p>
+    <!-- Delivery Fee Strategy Section -->
+    <div class="strategy">
+        <h2>Delivery Fee Strategy</h2>
+        <select onchange="setDeliveryStrategy(this.value)">
+            <option value="standard">Standard Delivery</option>
+            <option value="express">Express Delivery</option>
+            <option value="free">Free Delivery Coupon</option>
+        </select>
+        <p class="delivery-fee">Delivery Fee: $<span id="deliveryFee">5</span></p>
+    </div>
 
-    <h2>Order Tracking</h2>
-    <button onclick="trackOrder()">Track Order</button>
-    <p id="trackingStatus">No order placed yet.</p>
+    <!-- Order Tracking Section -->
+    <div class="tracking">
+        <h2>Order Tracking</h2>
+        <button onclick="trackOrder()">Track Order</button>
+        <p id="trackingStatus">No order placed yet.</p>
+    </div>
+
 </div>
 
 <script>
-    // Observer Pattern: Notify delivery agents
+    // ================= Observer Pattern =================
     const deliveryAgents = [];
     function addDeliveryAgent(agent) { deliveryAgents.push(agent); }
     function notifyDeliveryAgents(order) {
         deliveryAgents.forEach(agent => agent.update(order));
+        const notification = document.getElementById('notification');
+        notification.style.display = 'block';
+        notification.innerText = `Delivery Agents Notified: ${order.item} from ${order.restaurant}`;
+        setTimeout(() => { notification.style.display = 'none'; }, 3000);
     }
 
-    // Sample delivery agent
-    const agent1 = {
-        update: (order) => console.log("Agent1 notified for order:", order)
-    };
+    // Sample agent
+    const agent1 = { update: (order) => console.log("Agent1 notified:", order) };
     addDeliveryAgent(agent1);
 
-    // Strategy Pattern: Delivery fee
+    // ================= Strategy Pattern =================
     let deliveryStrategy = 'standard';
     function setDeliveryStrategy(strategy) {
         deliveryStrategy = strategy;
@@ -106,13 +149,14 @@
     }
     function updateDeliveryFee() {
         let fee = 0;
-        if (deliveryStrategy === 'standard') fee = 5;
-        else if (deliveryStrategy === 'express') fee = 10;
-        else if (deliveryStrategy === 'free') fee = 0;
+        if(deliveryStrategy === 'standard') fee = 5;
+        else if(deliveryStrategy === 'express') fee = 10;
+        else if(deliveryStrategy === 'free') fee = 0;
         document.getElementById('deliveryFee').textContent = fee;
     }
+    updateDeliveryFee();
 
-    // Command Pattern: Place, cancel, track order
+    // ================= Command Pattern =================
     const commands = {
         place: (restaurant, item) => {
             notifyDeliveryAgents({restaurant, item});
@@ -125,7 +169,6 @@
             alert(document.getElementById('trackingStatus').textContent);
         }
     };
-
     function placeOrder(restaurant, item) { commands.place(restaurant, item); }
     function cancelOrder(restaurant, item) { commands.cancel(restaurant, item); }
     function trackOrder() { commands.track(); }
